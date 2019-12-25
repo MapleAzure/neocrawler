@@ -3,6 +3,7 @@
  */
 
 var express = require('express');
+var bodyParser = require('body-parser')
 var controller = require('./routecontroller.js');
 var routes = require('./routes')
 var http = require('http');
@@ -63,7 +64,9 @@ webconfig.prototype.launch = function(settings){
 		, dest: __dirname + '/public'
 		}));
 	  app.use(express.static(__dirname + '/public'));
-	  app.use(express.bodyParser());
+	//   app.use(express.bodyParser());
+	  app.use(bodyParser.json())
+
 	  app.use(express.methodOverride());
 	  app.use(app.router);
 	  app.use(express.directory(__dirname + '/public'));

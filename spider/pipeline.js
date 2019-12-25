@@ -72,7 +72,7 @@ pipeline.prototype.save_links = function(page_url,version,linkobjs,drill_relatio
     var index = 0;
     if(!version)version = (new Date()).getTime();
     async.whilst(
-        function () { return index < aliasArr.length; },
+        function (cb) { cb(null, index < aliasArr.length) },
         function (cb) {
             var alias = aliasArr[index];
             var links = linkobjs[alias];
@@ -88,7 +88,7 @@ pipeline.prototype.save_links = function(page_url,version,linkobjs,drill_relatio
             ////////////////////////////////link array/////////////////////////
             var sindex = 0;
             async.whilst(
-                function () { return sindex < links.length; },
+                function (cb) { cb(null, sindex < links.length) },
                 function (scb) {
                     var link = links[sindex];
                     linkCount++;

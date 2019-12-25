@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "async": ">=0.2.10",
+    "body-parser": "^1.19.0",
     "bufferhelper": "0.2.0",
     "bytebuffer": "^5.0.1",
     "cheerio": "0.12.4",

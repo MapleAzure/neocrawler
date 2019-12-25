@@ -135,15 +135,20 @@ scheduler.prototype.doSchedule = function(){
             var index = -1;
             var left = 0;
             async.whilst(
-                function() { index++;return index < scheduler.priotity_list.length },
+                function(cb) { 
+                    index++;
+                    cb(null, index < scheduler.priotity_list.length )
+                    // return index < scheduler.priotity_list.length 
+                },
                 function(cb) {
                     var xdriller = scheduler.priotity_list[index];
+                    console.log((new Date()).getTime()-xdriller['first_schedule'], xdriller['interval']*1000)
                     //--check reschedule-------------
                     if((new Date()).getTime()-xdriller['first_schedule']>=xdriller['interval']*1000)scheduler.reSchedule(xdriller,index);
                     //-------------------------------
                     scheduler.doScheduleExt(xdriller,avg_rate,left,function(more){
                         left = more;
-                        cb();
+                        cb(null, index);
                     });
                 },
                 function(err) {
@@ -176,7 +181,6 @@ scheduler.prototype.reSchedule = function(driller,index){
             }
         }else links.push(link);
     }
-
     for(var i=0;i<links.length;i++){
         (function(link){
             scheduler.updateLinkState(link,'schedule',scheduler.schedule_version,function(bol){
@@ -214,7 +218,7 @@ scheduler.prototype.doScheduleExt = function(xdriller,avg_rate,more,cb){
             var count = 0;
             var pointer = true;//current point, false means end of list
             async.whilst(
-                function (){ return count < ct && pointer; },
+                function (cb){ cb(null, count < ct && pointer) },
                 function (callback) {
                     if(xdriller['rule']=='LIFO'){
                         redis_cli0.rpop('urllib:'+xdriller['key'],function(err, url){
@@ -419,6 +423,7 @@ scheduler.prototype.updateLinkState = function(link,state,version,callback){
     var urlhash = crypto.createHash('md5').update(link+'').digest('hex');
     this.redis_cli1.hgetall(urlhash,function(err,link_info){
         if(err){logger.error('get state of link('+link+') fail: '+err);return callback(false);}
+        console.log(link_info)
         if(link_info&&!isEmpty(link_info)){
             var t_record = link_info['records'];
             var records = [];

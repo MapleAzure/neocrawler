@@ -1,4 +1,5 @@
 var rule = require('../models/drillingRule.js');
+const { spawn } = require('child_process')
 
 //default
 var template =  {
@@ -94,7 +95,6 @@ exports.create = function(req, res) {
 
 //    console.log("key", key);
     //console.log("url:", urlencode(req.body.url_pattern));
-
     rule.create(key, jsonobj, function(err, result){
         if(!err) {
 
@@ -124,7 +124,7 @@ exports.destroy = function(req,res) {
       if(!err){
 //          console.log('Rule', req.params.id, 'deleted.');
           rule.getDrillingRules(function(err, result){
-          rules = result; 
+          rules = result;
           //res.render('rule/index', {title : 'Drilling rule', rules:result});
           res.redirect('rule');
       });
@@ -201,3 +201,89 @@ exports.update = function(req,res) {
     }
    });  
 };
+
+// new api set rules
+exports.createRule = function (req, res) {
+    var jsonobj = req.body;
+    var dataobj = {};
+    for(i in jsonobj){
+        if(jsonobj.hasOwnProperty(i)){
+            if(typeof(jsonobj[i])==='object')dataobj[i] = JSON.stringify(jsonobj[i]);
+            else{
+                dataobj[i] = jsonobj[i];}
+        }
+    }
+    var key = 'driller:' + jsonobj['domain'] + ':' + jsonobj['alias'];
+
+    rule.update(key, dataobj, function(err, result){
+        if(!err){
+            // rule.getRulesByCondition(req.session.searchBox,function(err, result){
+            //     rules = result; 
+            //     req.session.list = rules;
+            // }); 
+            res.send({
+                status: 200,
+                data: result
+            });
+        }
+    });
+}
+
+exports.getRuleList = function (req, res) {
+    rule.getDrillingRules(function(err, result){
+        rules = result;
+        var totalPage = result.length / 10;
+        if(totalPage > 0) {            
+            rules = result.slice(0, 10);
+        }
+        res.send({
+            status: 200,
+            data: {
+                list: rules,
+                totalPage: totalPage
+            }
+        });
+    });     
+}
+
+exports.runSchedule = function (req, res) {
+    let workerProcess = spawn('node', ['run.js', '-i', 'abc', '-a', 'schedule'])
+    workerProcess.stdout.on('data',(data) => {
+        console.log('schedule:' + data);
+        res.send({
+            status: 200,
+            data: 'success'
+        })
+    });
+
+    workerProcess.stderr.on('data',(data) => {
+        console.log('schedule:' + data);
+    });
+
+    workerProcess.on('close', (code) => {
+        console.log('schedule子进程已退出，退出码 ' + code);
+    });
+}
+
+exports.runCrawl = function (req, res) {
+    let workerProcess = spawn('node', ['run.js', '-i', 'abc', '-a', 'crawl'])
+    workerProcess.stdout.on('data',(data) => {
+        console.log('crawl:' + data);
+        res.send({
+            status: 200,
+            data: 'success'
+        })
+    });
+
+    workerProcess.stderr.on('data',(data) => {
+        console.log('crawl:' + data);
+        res.send({
+            status: 510,
+            data: 'child process error'
+        })
+    });
+
+    workerProcess.on('close', (code) => {
+        console.log('crawl子进程已退出，退出码 ' + code);
+    });
+}

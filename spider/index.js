@@ -143,6 +143,7 @@ spiderCore.prototype.test = function(link){
 
     this.on('crawled',function(crawled_info){
         logger.debug('crawl '+crawled_info['url']+' finish');
+        // console.log(crawled_info)
         if(!this.extractor.validateContent(crawled_info)){
             logger.error(util.format('invalidate content %s',crawled_info['url']));
         }

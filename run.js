@@ -42,7 +42,7 @@ var log_level = 'DEBUG';
 if(settings['log_level'])log_level = settings['log_level'];
 ////crawling action///////////////////////////////////////////////////////////
 var crawling = function(){
-	var logger = logging.getLogger('crawling',options['i'],log_level);
+	var logger = logging.getLogger('crawling11',options['i'],log_level);
     settings['logger'] = logger;
     settings['instance'] = options['i'];
     var spider = new (require('./spider'))(settings);

@@ -84,8 +84,9 @@ exports.linkdb = function(req, res) {
             ruledb.keys('urllib:driller:*',function(err,keys){
                 if(!err&&keys){
                     var c = 0;
-                    async.whilst(function(){
-                        return c<keys.length;
+                    async.whilst(function(cb){
+                        cb(null, c<keys.length)
+                        // return c<keys.length;
                     },function(cb){
                         var itm = keys[c++];
                         ruledb.llen(itm,function(err,size){
@@ -141,8 +142,9 @@ exports.chart = function(req, res) {
 
     var index = days;
     async.whilst(
-        function(){
-            return index >= 0;
+        function(cb){
+            cb(null, index >= 0)
+            // return index >= 0;
         },
         function(callback){
             var td = new Date(nl-86400000*index--);

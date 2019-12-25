@@ -180,7 +180,6 @@ extractor.prototype.getDrillRelation = function($,crawl_info){
 extractor.prototype.extract = function(crawl_info){
     if(crawl_info['origin']['format']=='binary')return crawl_info;
     var extract_rule = this.spiderCore.spider.getDrillerRule(crawl_info['origin']['urllib'],'extract_rule');
-
     if(crawl_info['origin']['drill_rules']||extract_rule['rule']){
         var $ = cheerio.load(crawl_info['content']);
     }

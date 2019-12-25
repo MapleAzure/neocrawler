@@ -44,5 +44,11 @@ exports.mapRoute = function(app) {
 
     app.get(prefix_monitor + "/daily", prefixMonitorObj.daily);
     app.get(prefix_monitor + "/linkdb", prefixMonitorObj.linkdb);
-    app.get(prefix_monitor + "/chart", prefixMonitorObj.chart);
+	app.get(prefix_monitor + "/chart", prefixMonitorObj.chart);
+	
+/***************************************************************************/
+	app.get('/runCrawl', prefixRuleObj.runCrawl)
+	app.post('/createRule', prefixRuleObj.createRule)
+	app.get('/getRuleList', prefixRuleObj.getRuleList)
+	app.get('/runSchedule', prefixRuleObj.runSchedule)
 };

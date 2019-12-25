@@ -82,10 +82,7 @@ var drillingRule = {
 			if(err){
 					console.error('ERROR:', err);
 				}else{
-
 					var callFunctions = new Array();
-
-
 					var rules = [];
 					for(k in keys){
 						callFunctions.push(self.makeCallbackFunc(keys[k]));

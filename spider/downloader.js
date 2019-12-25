@@ -8,7 +8,7 @@ var redis = require("redis");
 var events = require('events');
 var child_process = require('child_process');
 var path = require('path');
-var http = require('http');
+var http = require('https');
 require('../lib/jsextend.js');
 var iconv = require('iconv-lite');
 var BufferHelper = require('bufferhelper');

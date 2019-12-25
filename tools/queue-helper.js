@@ -47,8 +47,9 @@ var put_fail_url_into_queue = function(){
                         if(err)throw err;
                         var count = 0;
                         async.whilst(
-                            function(){
-                                return count < zkeys.length;
+                            function(cb){
+                                cb(null, count < zkeys.length)
+                                // return count < zkeys.length;
                             },
                             function(callback){
                                 var zkey = zkeys[count++];
@@ -58,8 +59,9 @@ var put_fail_url_into_queue = function(){
                                     redis_cli.zrange(zkey,0,(new Date()).getTime(),function(err,keylist){
                                         var sub_count = 0;
                                         async.whilst(
-                                            function(){
-                                                return sub_count < keylist.length;
+                                            function(cb){
+                                                cb(null, sub_count < keylist.length)
+                                                // return sub_count < keylist.length;
                                             },
                                             function(cb){
                                                 var link = keylist[sub_count++];
@@ -113,8 +115,9 @@ var put_stuck_url_into_queue = function(){
                         if(err)throw err;
                         var count = 0;
                         async.whilst(
-                            function(){
-                                return count < zkeys.length;
+                            function(cb){
+                                cb(null, count < zkeys.length)
+                                // return count < zkeys.length;
                             },
                             function(callback){
                                 var zkey = zkeys[count++];
@@ -124,8 +127,9 @@ var put_stuck_url_into_queue = function(){
                                     redis_cli.zrange(zkey,0,(new Date()).getTime(),function(err,keylist){
                                         var sub_count = 0;
                                         async.whilst(
-                                            function(){
-                                                return sub_count < keylist.length;
+                                            function(cb){
+                                                cb(null, sub_count < keylist.length)
+                                                // return sub_count < keylist.length;
                                             },
                                             function(cb){
                                                 var link = keylist[sub_count++];
@@ -173,8 +177,9 @@ var filter_duplicated_queue = function(){
                 if(err)throw err;
                 var count = 0;
                 async.whilst(
-                    function(){
-                        return count < zkeys.length;
+                    function(cb){
+                        cb(null, count < zkeys.length)
+                        // return count < zkeys.length;
                     },
                     function(callback){
                         var zkey = zkeys[count++];
