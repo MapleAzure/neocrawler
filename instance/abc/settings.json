@@ -14,11 +14,12 @@
     "check_driller_rules_interval":120,
     "spider_concurrency":5,
     "spider_request_delay":0,
-    "schedule_interval":1,
+    "schedule_interval": 30,
     "schedule_quantity_limitation":200,
     "download_retry":2,
-    "log_level":"DEBUG",
     "use_ssdb":false,
+    "log_level": "DEBUG",
+    "extractorType": "column",
     "to_much_fail_exit":false,
     "keep_link_relation":false
 }
