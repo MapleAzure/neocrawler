@@ -125,7 +125,8 @@ scheduler.prototype.doSchedule = function() {
         var scheduler = this;
         scheduler.schedule_version = (new Date()).getTime();
         var redis_cli = scheduler.redis_cli0;
-        redis_cli.llen('queue:scheduled:all', function(err, queue_length) {
+        var instanceName = this.settings.instance_name;
+        redis_cli.llen(`queue:scheduled::${instanceName}`, function(err, queue_length) {
             if (err) throw (err);
             var balance = scheduler.settings['schedule_quantity_limitation'] - queue_length;
             if (balance < 0) balance = 0;
@@ -167,6 +168,7 @@ scheduler.prototype.doSchedule = function() {
 scheduler.prototype.reSchedule = function(driller, index) {
         var scheduler = this;
         logger.debug('reschedule ' + driller['key']);
+        var instanceName = this.settings.instance_name;
         var links = [];
         for (var i = 0; i < driller['seed'].length; i++) {
             var link = driller['seed'][i];
@@ -184,7 +186,7 @@ scheduler.prototype.reSchedule = function(driller, index) {
             (function(link) {
                 scheduler.updateLinkState(link, 'schedule', scheduler.schedule_version, function(bol) {
                     if (bol) {
-                        scheduler.redis_cli0.rpush('queue:scheduled:all', link, function(err, value) {
+                        scheduler.redis_cli0.rpush(`queue:scheduled:${instanceName}`, link, function(err, value) {
                             logger.info('reschedule url: ' + link);
                         });
                     } else {
@@ -344,6 +346,7 @@ scheduler.prototype.checkURL = function(url, interval, callback) {
     }
     var redis_cli0 = this.redis_cli0;
     var redis_cli1 = this.redis_cli1;
+    var instanceName = this.settings.instance_name;
     var kk = crypto.createHash('md5').update(url).digest('hex');
     redis_cli1.hgetall(kk, function(err, values) {
         if (err) { return callback(false); }
@@ -398,7 +401,7 @@ scheduler.prototype.checkURL = function(url, interval, callback) {
 
         scheduler.updateLinkState(url, 'schedule', false, function(bol) {
             if (bol) {
-                redis_cli0.rpush('queue:scheduled:all', url, function(err, value) {
+                redis_cli0.rpush(`queue:scheduled:${instanceName}`, url, function(err, value) {
                     if (err) {
                         logger.warn('Append ' + url + ' to queue failure');
                         return callback(false);

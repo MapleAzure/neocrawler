@@ -1,6 +1,9 @@
 var rule = require('../models/drillingRule.js');
 const { spawn } = require('child_process');
+const Parser = require('rss-parser');
 const Db = require('../db/index');
+const crypto = require('crypto');
+const parser = new Parser();
 
 //default
 var template = {
@@ -249,8 +252,45 @@ exports.getRuleList = function(req, res) {
     });
 }
 
+exports.createRssSubList =  function(req, res) {
+    const db = new Db();
+    var _id = crypto.createHash('md5').update(req.query.url).digest('hex');
+    var query = {
+        "$or": [{
+            '_id': _id
+        }]
+    };
+    db.connect('rssSubList').then(col => {
+        col.findOne(query, async function (err, item) {
+            if (item) {
+                res.send({status: 200,data: 'rss已存在'});
+            } else {
+                let feed = await parser.parseURL(req.query.url);
+                delete feed.items;
+                feed['_id'] = _id;
+                col.insert(feed, {w:1}, function(err, result) {
+                    if (result) res.send({status: 200,data: 'success'});
+                });
+            }
+        })
+    })
+}
+
+exports.getRssSubList = function(req, res) {
+    const db = new Db();
+    db.connect('rssSubList').then(col => {
+        col.find({}).toArray((err, items) => {
+            res.send({
+                status: 200,
+                data: items
+            })
+        });
+    })
+}
+
 exports.runSchedule = function(req, res) {
-    let workerProcess = spawn('node', ['run.js', '-i', 'abc', '-a', 'schedule'])
+    let workerProcess = spawn('pm2', ['start', 'run.js', '--name', 'abc', '--', '-i', 'abc', '-a', 'schedule'])
+    // let workerProcess = spawn('node', ['run.js', '-i', 'abc', '-a', 'schedule'])
     workerProcess.stdout.on('data', (data) => {
         console.log('schedule:' + data);
         res.send({
@@ -273,7 +313,8 @@ exports.runSchedule = function(req, res) {
 }
 
 exports.runCrawl = function(req, res) {
-    let workerProcess = spawn('node', ['run.js', '-i', 'abc', '-a', 'crawl'])
+    let workerProcess = spawn('pm2', ['start', 'run.js', '--name', 'abc', '--', '-i', 'abc', '-a', 'crawl'])
+    // let workerProcess = spawn('pm2', ['run.js', '-i', 'abc', '-a', 'crawl'])
     workerProcess.stdout.on('data', (data) => {
         console.log('crawl:' + data);
         res.send({
@@ -297,7 +338,7 @@ exports.runCrawl = function(req, res) {
 
 exports.getDBList = function(req, res) {
     const db = new Db();
-    db.connect().then(col => {
+    db.connect('crawled').then(col => {
         col.find({}).toArray((err, items) => {
             res.send({
                 status: 200,

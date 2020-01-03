@@ -182,7 +182,8 @@ spider.prototype.getUrlQueue = function(callback){
     var spider = this;
     var redis_driller_db = this.redis_cli0;
     var redis_urlinfo_db = this.redis_cli1;
-        redis_driller_db.lpop('queue:scheduled:all',function(err, link){
+    var instanceName = this.spiderCore.settings.instance_name;
+        redis_driller_db.lpop(`queue:scheduled:${instanceName}`,function(err, link){
             //2----------------------------------------------------------------------------------------
             if(!link){
                 logger.info('No candidate queue, '+spider.queue_length+' urls in crawling.');

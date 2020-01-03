@@ -385,10 +385,11 @@ extractor.prototype.cssSelector = function($, expression, pick, index) {
 }
 
 extractor.prototype.isAllParent = function(val, extract_rule) {
+    if (val.parent().length === 0) return true;
     var isAllParent = Object.keys(extract_rule).every(ruleItem => {
         return val.parent().find(extract_rule[ruleItem].expression).length > 0
     })
-    return !isAllParent;
+    return isAllParent;
 }
 
 /**
@@ -412,12 +413,12 @@ extractor.prototype.columnSelector = function($, extract_rule, expressionUnique,
         var arrayResult = [];
         for (var i = 0; i < tmp_val.length; i++) {
             var val = tmp_val.eq(i);
-            while (this.isAllParent(val, extract_rule)) {
+            while (!this.isAllParent(val, extract_rule)) {
                 val = val.parent()
             }
             let ruleObj = new Object()
             Object.keys(extract_rule).map(ruleItem => {
-                ruleObj[ruleItem] = this.cssSelectorPicker(val.parent().find(extract_rule[ruleItem].expression), pick)
+                ruleObj[ruleItem] = this.cssSelectorPicker(val.parent().find(extract_rule[ruleItem].expression), extract_rule[ruleItem].pick)
             })
             arrayResult.push(ruleObj);
         }

@@ -20,6 +20,7 @@
     "use_ssdb":false,
     "log_level": "DEBUG",
     "extractorType": "column",
+    "instance_name": "abc",
     "to_much_fail_exit":false,
     "keep_link_relation":false
 }
