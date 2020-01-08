@@ -263,14 +263,17 @@ exports.createRssSubList =  function(req, res) {
     db.connect('rssSubList').then(col => {
         col.findOne(query, async function (err, item) {
             if (item) {
-                res.send({status: 200,data: 'rss已存在'});
+                res.send({status: 10001, data: 'Rss already exists'});
             } else {
-                let feed = await parser.parseURL(req.query.url);
-                delete feed.items;
-                feed['_id'] = _id;
-                col.insert(feed, {w:1}, function(err, result) {
-                    if (result) res.send({status: 200,data: 'success'});
-                });
+                try {
+                    let feed = await parser.parseURL(req.query.url);
+                    feed['_id'] = _id;
+                    col.insert(feed, {w:1}, function(err, result) {
+                        if (result) res.send({status: 200, data: 'success'});
+                    });
+                } catch (error) {
+                    res.send({status: 10002,data: 'Invalid rss link'});
+                }
             }
         })
     })
